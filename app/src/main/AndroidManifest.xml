@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.bluetoothmessanger">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,7 +19,7 @@
         android:theme="@style/Theme.BluetoothMessanger"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".feature_bluetoothMessanger.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BluetoothMessanger">
