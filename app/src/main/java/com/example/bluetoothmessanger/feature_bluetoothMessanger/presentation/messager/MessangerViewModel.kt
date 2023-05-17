@@ -10,5 +10,5 @@ class MessangerViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    
+
 }
