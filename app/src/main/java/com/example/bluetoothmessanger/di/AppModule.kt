@@ -2,6 +2,7 @@ package com.example.bluetoothmessanger.di
 
 import android.app.Application
 import android.content.Context
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller.BluetoothController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,4 +16,10 @@ class AppModule {
     @Singleton
     @Provides
     fun provideContext(application: Application): Context = application.applicationContext
+
+    @Singleton
+    @Provides
+    fun provideBluetoothController(): BluetoothController {
+        return BluetoothController
+    }
 }
