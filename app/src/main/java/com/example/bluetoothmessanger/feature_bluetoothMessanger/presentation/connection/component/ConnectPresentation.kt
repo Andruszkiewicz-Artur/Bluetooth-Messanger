@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,14 +30,14 @@ fun ConnectPresentation(
     navController: NavHostController,
     viewModel: ConnectViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
 
     Column(
 
     ) {
         DevicesList(
-            pairedDevices = state.value.pairedDevices,
-            scannedDevices = state.value.scannedDevices
+            pairedDevices = state.pairedDevices,
+            scannedDevices = state.scannedDevices
         )
 
         Row(
