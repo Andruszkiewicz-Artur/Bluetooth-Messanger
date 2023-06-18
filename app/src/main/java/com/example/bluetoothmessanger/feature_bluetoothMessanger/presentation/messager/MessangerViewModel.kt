@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MessangerViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+
 ): ViewModel() {
 
 

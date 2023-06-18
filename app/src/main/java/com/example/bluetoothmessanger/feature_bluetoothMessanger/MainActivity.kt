@@ -32,38 +32,37 @@ class MainActivity : ComponentActivity() {
         get() = bluetoothAdapter?.isEnabled == true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val enableBluetoothLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { }
+
+        val permissionsLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { perms ->
+            val canEnableBluetooth = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                perms[Manifest.permission.BLUETOOTH_CONNECT] == true
+            } else true
+
+            if(canEnableBluetooth && !isBluetoothEnabled) {
+                enableBluetoothLauncher.launch(
+                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                )
+            }
+        }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionsLauncher.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                )
+            )
+        }
+
         setContent {
             BluetoothMessangerTheme {
                 val navHostController = rememberNavController()
-
-                val enableBluetoothLauncher = registerForActivityResult(
-                    ActivityResultContracts.StartActivityForResult()
-                ) { }
-
-                val permissionsLauncher = registerForActivityResult(
-                    ActivityResultContracts.RequestMultiplePermissions()
-                ) { perms ->
-                    val canEnableBluetooth = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        perms[Manifest.permission.BLUETOOTH_CONNECT] == true
-                    } else true
-
-                    if(canEnableBluetooth && !isBluetoothEnabled) {
-                        enableBluetoothLauncher.launch(
-                            Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                        )
-                    }
-                }
-
-                LaunchedEffect(key1 = true) {
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        permissionsLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.BLUETOOTH_SCAN,
-                                Manifest.permission.BLUETOOTH_CONNECT,
-                            )
-                        )
-                    }
-                }
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
