@@ -37,12 +37,13 @@ fun ConnectPresentation(
     ) {
         DevicesList(
             pairedDevices = state.pairedDevices,
-            scannedDevices = state.scannedDevices
+            scannedDevices = state.scannedDevices,
         )
 
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .weight(1f),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Button(onClick = { viewModel.onEvent(ConnectEvent.startScan) }) {
