@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.example.bluetoothmessanger'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.bluetoothmessanger"
         minSdk 26
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -24,7 +24,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -39,7 +40,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
     packagingOptions {
         resources {
@@ -52,7 +53,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha02'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha03'
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
@@ -64,7 +65,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // Navigation
-    def navVersion = "2.7.0-beta01"
+    def navVersion = "2.6.0"
 
     implementation "androidx.navigation:navigation-compose:$navVersion"
 
@@ -78,8 +79,4 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_hilt_version"
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
-}
-
-kapt {
-    correctErrorTypes true
 }
