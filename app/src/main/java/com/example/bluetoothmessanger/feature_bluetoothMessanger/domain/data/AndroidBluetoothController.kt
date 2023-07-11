@@ -2,6 +2,7 @@ package com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.data
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
@@ -15,15 +16,20 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controll
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDevice
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.util.ConnectionResult
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
@@ -43,7 +49,12 @@ class AndroidBluetoothController(
     private var currentClientSocket: BluetoothSocket? = null
 
     private val _scannedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
-
+    private val _isConnected = MutableStateFlow(false)
+    private val _errors = MutableSharedFlow<String>()
+    override val errors: SharedFlow<String>
+        get() = _errors.asSharedFlow()
+    override val isConnected: StateFlow<Boolean>
+        get() = _isConnected.asStateFlow()
     override val scannedDevices: StateFlow<List<BluetoothDevice>>
         get() = _scannedDevices.asStateFlow()
 
@@ -58,8 +69,28 @@ class AndroidBluetoothController(
         }
     }
 
+    private val bluetoothStateReceiver = BluetoothStateReceiver { isConnection, bluetoothDevice ->
+        if(bluetoothAdapter?.bondedDevices?.contains(bluetoothDevice) == false) {
+            _isConnected.update {
+                isConnection
+            }
+        } else {
+            CoroutineScope(Dispatchers.IO).launch {
+                _errors.emit("Can`t connect to a non-paired device.")
+            }
+        }
+    }
+
     init {
         updatePairedDevices()
+        context.registerReceiver(
+            bluetoothStateReceiver,
+            IntentFilter().apply {
+                addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
+                addAction(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED)
+                addAction(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED)
+            }
+        )
     }
 
     override fun startDiscovery() {
@@ -87,6 +118,7 @@ class AndroidBluetoothController(
 
     override fun release() {
         context.unregisterReceiver(foundDeviceReceiver)
+        context.unregisterReceiver(bluetoothStateReceiver)
         closeConnection()
     }
 
@@ -140,11 +172,17 @@ class AndroidBluetoothController(
                 throw SecurityException("No Bluetooth connection permission")
             }
 
-            currentClientSocket = bluetoothAdapter
-                ?.getRemoteDevice(device.address)
+            val bluetoothDevice = bluetoothAdapter?.getRemoteDevice(device.address)
+
+            currentClientSocket = bluetoothDevice
                 ?.createRfcommSocketToServiceRecord(UUID.fromString(UUID_IDENTYFICATOR))
 
             stopDiscovery()
+
+            if(bluetoothAdapter?.bondedDevices?.contains(bluetoothDevice) == false) {
+
+            }
+
             currentClientSocket?.let { socket ->
                 try {
                     socket.connect()
