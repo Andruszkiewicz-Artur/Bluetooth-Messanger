@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 
-@Suppress("IMPLICIT_CAST_TO_ANY")
 class BluetoothStateReceiver(
     private val onStateChange: (isConnection: Boolean, BluetoothDevice) -> Unit
 ): BroadcastReceiver() {

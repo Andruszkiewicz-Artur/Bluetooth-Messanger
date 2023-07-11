@@ -12,9 +12,12 @@ import android.content.pm.PackageManager
 import com.example.bluetoothmessanger.core.static.Static.NAME_SERVICE
 import com.example.bluetoothmessanger.core.static.Static.UUID_IDENTYFICATOR
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toBluetoothDeviceDomain
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toByteArray
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller.BluetoothController
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDevice
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.service.BluetoothDataTransferService
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.util.ConnectionResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +28,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,6 +49,8 @@ class AndroidBluetoothController(
     private val bluetoothAdapter by lazy {
         bluetoothManager?.adapter
     }
+
+    private var dataTransferService: BluetoothDataTransferService? = null
 
     private var currentServiceSocket: BluetoothServerSocket? = null
     private var currentClientSocket: BluetoothSocket? = null
@@ -157,8 +164,19 @@ class AndroidBluetoothController(
                     null
                 }
                 emit(ConnectionResult.ConnectionEstablished)
-                currentServiceSocket?.let {
+                currentClientSocket?.let {
                     currentServiceSocket?.close()
+                    val service = BluetoothDataTransferService(it)
+                    dataTransferService = service
+
+                    emitAll(
+                        service
+                            .listenForIncomingMessage()
+                            .map {
+                                ConnectionResult.TransferSucceeded(it)
+                            }
+                    )
+
                 }
             }
         }.onCompletion {
@@ -179,14 +197,20 @@ class AndroidBluetoothController(
 
             stopDiscovery()
 
-            if(bluetoothAdapter?.bondedDevices?.contains(bluetoothDevice) == false) {
-
-            }
-
             currentClientSocket?.let { socket ->
                 try {
                     socket.connect()
                     emit(ConnectionResult.ConnectionEstablished)
+
+                    BluetoothDataTransferService(socket).also {
+                        dataTransferService = it
+                        emitAll(
+                            it.listenForIncomingMessage()
+                                .map {
+                                    ConnectionResult.TransferSucceeded(it)
+                                }
+                        )
+                    }
                 } catch (e: IOException) {
                     socket.close()
                     currentClientSocket = null
@@ -201,5 +225,21 @@ class AndroidBluetoothController(
         currentClientSocket?.close()
         currentClientSocket = null
         currentServiceSocket = null
+    }
+
+    override suspend fun trySendMessage(message: String): BluetoothMessage? {
+        if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT) && dataTransferService == null) {
+            return null
+        }
+
+        val bluetoothMessage = BluetoothMessage(
+            message = message,
+            senderName = bluetoothAdapter?.name ?: "Unknown name",
+            isFromLocalUser = true
+        )
+
+        dataTransferService?.sendMessage(bluetoothMessage.toByteArray())
+
+        return bluetoothMessage
     }
 }
