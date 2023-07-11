@@ -13,11 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDevice
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.presentation.connection.ConnectEvent
 
 @Composable
 fun DevicesList(
     pairedDevices: List<BluetoothDevice>,
-    scannedDevices: List<BluetoothDevice>
+    scannedDevices: List<BluetoothDevice>,
+    onClick: (BluetoothDeviceDomain) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -39,7 +42,7 @@ fun DevicesList(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .clickable {
-
+                        onClick(device)
                     }
             )
         }
@@ -48,7 +51,9 @@ fun DevicesList(
             Text(
                 text = "Scanned devices",
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 16.dp)
             )
         }
 
@@ -59,7 +64,7 @@ fun DevicesList(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .clickable {
-
+                        onClick(device)
                     }
             )
         }
