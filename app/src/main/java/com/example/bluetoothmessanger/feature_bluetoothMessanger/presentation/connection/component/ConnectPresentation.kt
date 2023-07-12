@@ -51,39 +51,53 @@ fun ConnectPresentation(
         }
     }
 
-    if (state.isConnecting) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            CircularProgressIndicator()
-            Text(text = "Connectiong...")
+    when {
+        state.isConnecting -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator()
+                Text(text = "Connecting...")
+            }
         }
-    } else {
-        Column {
-            DevicesList(
-                pairedDevices = state.pairedDevices,
-                scannedDevices = state.scannedDevices,
-                onClick = { device ->
-                    viewModel.onEvent(ConnectEvent.onDeviceClick(device))
+        state.isConnected -> {
+            ChatPresentation(
+                state = state,
+                onDisconnect = {
+                    viewModel.onEvent(ConnectEvent.disconnect)
+                },
+                onSendMessage = {
+                    viewModel.onEvent(ConnectEvent.sendMessage(it))
                 }
             )
+        }
+        else -> {
+            Column {
+                DevicesList(
+                    pairedDevices = state.pairedDevices,
+                    scannedDevices = state.scannedDevices,
+                    onClick = { device ->
+                        viewModel.onEvent(ConnectEvent.onDeviceClick(device))
+                    }
+                )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Button(onClick = { viewModel.onEvent(ConnectEvent.startScan) }) {
-                    Text(text = "Start Scan")
-                }
-                Button(onClick = { viewModel.onEvent(ConnectEvent.stopScan) }) {
-                    Text(text = "Stop Scan")
-                }
-                Button(onClick = { viewModel.onEvent(ConnectEvent.onStartServer) }) {
-                    Text(text = "Start Server")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Button(onClick = { viewModel.onEvent(ConnectEvent.startScan) }) {
+                        Text(text = "Start Scan")
+                    }
+                    Button(onClick = { viewModel.onEvent(ConnectEvent.stopScan) }) {
+                        Text(text = "Stop Scan")
+                    }
+                    Button(onClick = { viewModel.onEvent(ConnectEvent.onStartServer) }) {
+                        Text(text = "Start Server")
+                    }
                 }
             }
         }

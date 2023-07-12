@@ -9,4 +9,6 @@ sealed class ConnectEvent {
     object onStartServer: ConnectEvent()
 
     object disconnect: ConnectEvent()
+
+    data class sendMessage(val message: String): ConnectEvent()
 }
