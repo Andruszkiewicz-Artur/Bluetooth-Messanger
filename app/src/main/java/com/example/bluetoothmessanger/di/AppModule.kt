@@ -11,6 +11,13 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controll
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.data.AndroidBluetoothController
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.repository.MessagesRepository
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.repository.UsersRepository
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.message_use_cases.AddMessageUseCase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.message_use_cases.GetAllUserMessagesUseCase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.message_use_cases.MessagesUseCases
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.GetAllUserNamesUseCase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.RemoveUserNameUseCase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.UpsertUserNameUseCase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.UsersUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,7 +53,26 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideMessagesUseCases(repository: MessagesRepository): MessagesUseCases {
+        return MessagesUseCases(
+            getAllUserMessagesUseCase = GetAllUserMessagesUseCase(repository),
+            addMessageUseCase = AddMessageUseCase(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideUsersRepository(db: ChatDatabase): UsersRepository {
         return UsersRepositoryImpl(db.userDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUsersUseCases(repository: UsersRepository): UsersUseCases {
+        return UsersUseCases(
+            getAllUserNamesUseCase = GetAllUserNamesUseCase(repository),
+            upsertUserNameUseCase = UpsertUserNameUseCase(repository),
+            removeUserNameUseCase = RemoveUserNameUseCase(repository)
+        )
     }
 }
