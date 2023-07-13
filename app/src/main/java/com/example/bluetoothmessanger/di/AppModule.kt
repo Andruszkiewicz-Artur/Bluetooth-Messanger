@@ -2,6 +2,9 @@ package com.example.bluetoothmessanger.di
 
 import android.app.Application
 import android.content.Context
+import androidx.room.Room
+import com.example.bluetoothmessanger.core.static.Static
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.data_source.ChatDatabase
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller.BluetoothController
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.data.AndroidBluetoothController
 import dagger.Module
@@ -19,5 +22,15 @@ class AppModule {
     @Singleton
     fun provideBluetoothController(@ApplicationContext context: Context): BluetoothController {
         return AndroidBluetoothController(context = context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatDatabase(app: Application): ChatDatabase {
+        return Room.databaseBuilder(
+            app,
+            ChatDatabase::class.java,
+            Static.DATABASE_NAME
+        ).build()
     }
 }
