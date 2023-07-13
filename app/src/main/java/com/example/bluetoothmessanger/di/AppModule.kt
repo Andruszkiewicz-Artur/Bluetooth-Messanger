@@ -5,8 +5,12 @@ import android.content.Context
 import androidx.room.Room
 import com.example.bluetoothmessanger.core.static.Static
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.data_source.ChatDatabase
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.repository.MessageRepositoryImpl
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.repository.UsersRepositoryImpl
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller.BluetoothController
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.data.AndroidBluetoothController
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.repository.MessagesRepository
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.repository.UsersRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +36,17 @@ class AppModule {
             ChatDatabase::class.java,
             Static.DATABASE_NAME
         ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMessagesRepository(db: ChatDatabase): MessagesRepository {
+        return MessageRepositoryImpl(db.messageDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUsersRepository(db: ChatDatabase): UsersRepository {
+        return UsersRepositoryImpl(db.userDao)
     }
 }

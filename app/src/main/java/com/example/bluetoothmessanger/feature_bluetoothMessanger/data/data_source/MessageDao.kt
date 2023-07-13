@@ -12,6 +12,6 @@ interface MessageDao {
     fun getAllUserMessages(userAddress: String): List<MessageModel>
 
     @Insert()
-    suspend fun addNote(messageModel: MessageModel)
+    suspend fun addMessage(messageModel: MessageModel)
 
 }
