@@ -11,4 +11,7 @@ sealed class ConnectEvent {
     object disconnect: ConnectEvent()
 
     data class sendMessage(val message: String): ConnectEvent()
+
+    data class setNewName(val newName: String): ConnectEvent()
+    object removeName: ConnectEvent()
 }

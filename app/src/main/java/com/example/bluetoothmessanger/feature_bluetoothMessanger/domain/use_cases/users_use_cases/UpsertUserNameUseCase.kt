@@ -7,7 +7,7 @@ class UpsertUserNameUseCase(
     private val repository: UsersRepository
 ) {
 
-    suspend operator fun invoke(userModel: UserModel) {
+    suspend fun invoke(userModel: UserModel) {
         repository.upsertUserName(userModel)
     }
 

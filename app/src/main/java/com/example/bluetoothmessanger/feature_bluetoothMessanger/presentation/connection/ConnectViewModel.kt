@@ -9,6 +9,7 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controll
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.MessageModel
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.UserModel
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.message_use_cases.MessagesUseCases
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.UsersUseCases
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.util.ConnectionResult
@@ -48,9 +49,7 @@ class ConnectViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _state.update { it.copy(
-                userNames = usersUseCases.getAllUserNamesUseCase()
-            ) }
+            updateUserNames()
         }
 
         bluetoothController.isConnected.onEach { isConnected ->
@@ -118,6 +117,32 @@ class ConnectViewModel @Inject constructor(
                     }
                 }
             }
+
+            ConnectEvent.removeName -> {
+                if(state.value.correspondenceAddress != null) {
+                    viewModelScope.launch {
+                        usersUseCases.removeUserNameUseCase.invoke(
+                            state.value.userNames.filter { it.id == state.value.correspondenceAddress }.first()
+                        )
+
+                        updateUserNames()
+                    }
+                }
+            }
+            is ConnectEvent.setNewName -> {
+                if(state.value.correspondenceAddress != null) {
+                    viewModelScope.launch {
+                        usersUseCases.upsertUserNameUseCase.invoke(
+                            UserModel(
+                                id = state.value.correspondenceAddress ?: "",
+                                userName = event.newName
+                            )
+                        )
+
+                        updateUserNames()
+                    }
+                }
+            }
         }
     }
 
@@ -168,5 +193,11 @@ class ConnectViewModel @Inject constructor(
                 message.toMessageModel(state.value.correspondenceAddress ?: "")
             )
         }
+    }
+
+    private fun updateUserNames() {
+        _state.update { it.copy(
+            userNames = usersUseCases.getAllUserNamesUseCase()
+        ) }
     }
 }
