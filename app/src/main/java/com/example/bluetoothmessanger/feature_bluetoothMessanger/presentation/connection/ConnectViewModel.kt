@@ -1,5 +1,6 @@
 package com.example.bluetoothmessanger.feature_bluetoothMessanger.presentation.connection
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toMessageModel
@@ -10,6 +11,7 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_case
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.UsersUseCases
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.util.ConnectionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +38,9 @@ class ConnectViewModel @Inject constructor(
         bluetoothController.pairedDevice,
         _state
     ) { scannedDevices, pairedDevices, state ->
+        Log.d("check Scanned", scannedDevices.toString())
+        Log.d("check paired", pairedDevices.toString())
+
         state.copy(
             scannedDevices = scannedDevices,
             pairedDevices = pairedDevices,
@@ -44,9 +49,7 @@ class ConnectViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
     init {
-        viewModelScope.launch {
-            updateUserNames()
-        }
+        updateUserNames()
 
         bluetoothController.isConnected.onEach { isConnected ->
             _state.update { it.copy(
@@ -66,6 +69,7 @@ class ConnectViewModel @Inject constructor(
     fun onEvent(event: ConnectEvent) {
         when (event) {
             ConnectEvent.startScan -> {
+                Log.d("Check Click", "Start Scan")
                 bluetoothController.startDiscovery()
             }
             ConnectEvent.stopScan -> {
@@ -80,7 +84,6 @@ class ConnectViewModel @Inject constructor(
                 bluetoothController
                     .connectToDevice(event.device)
                     .listen()
-                    .isCompleted
             }
             ConnectEvent.onStartServer -> {
                 _state.update { it.copy(
@@ -190,17 +193,21 @@ class ConnectViewModel @Inject constructor(
         bluetoothController.release()
     }
 
-    private suspend fun addMessage(message: BluetoothMessage) {
-        if(state.value.correspondenceAddress != null) {
-            messagesUseCases.addMessageUseCase.invoke(
-                message.toMessageModel(state.value.correspondenceAddress ?: "")
-            )
+    private fun addMessage(message: BluetoothMessage) {
+        viewModelScope.launch {
+            if(state.value.correspondenceAddress != null) {
+                messagesUseCases.addMessageUseCase.invoke(
+                    message.toMessageModel(state.value.correspondenceAddress ?: "")
+                )
+            }
         }
     }
 
     private fun updateUserNames() {
-        _state.update { it.copy(
-            userNames = usersUseCases.getAllUserNamesUseCase()
-        ) }
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(
+                userNames = usersUseCases.getAllUserNamesUseCase()
+            ) }
+        }
     }
 }

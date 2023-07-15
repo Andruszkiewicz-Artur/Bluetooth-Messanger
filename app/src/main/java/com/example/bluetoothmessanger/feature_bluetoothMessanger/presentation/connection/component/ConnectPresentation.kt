@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -17,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.presentation.connection.ConnectEvent
@@ -80,30 +83,46 @@ fun ConnectPresentation(
             )
         }
         else -> {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 DevicesList(
                     pairedDevices = state.pairedDevices,
                     scannedDevices = state.scannedDevices,
                     usersNames = state.userNames,
                     onClick = { device ->
                         viewModel.onEvent(ConnectEvent.onDeviceClick(device))
-                    }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    horizontalArrangement = Arrangement.SpaceAround
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(onClick = { viewModel.onEvent(ConnectEvent.startScan) }) {
-                        Text(text = "Start Scan")
+                        Text(
+                            text = "Start Scan",
+                            fontSize = 10.sp
+                        )
                     }
                     Button(onClick = { viewModel.onEvent(ConnectEvent.stopScan) }) {
-                        Text(text = "Stop Scan")
+                        Text(
+                            text = "Stop Scan",
+                            fontSize = 10.sp
+                        )
                     }
                     Button(onClick = { viewModel.onEvent(ConnectEvent.onStartServer) }) {
-                        Text(text = "Start Server")
+                        Text(
+                            text = "Start Server",
+                            fontSize = 10.sp
+                        )
                     }
                 }
             }

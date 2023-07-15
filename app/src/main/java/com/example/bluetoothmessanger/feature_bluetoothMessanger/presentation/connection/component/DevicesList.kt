@@ -22,10 +22,11 @@ fun DevicesList(
     pairedDevices: List<BluetoothDevice>,
     scannedDevices: List<BluetoothDevice>,
     usersNames: Map<String, String>,
-    onClick: (BluetoothDeviceDomain) -> Unit
+    onClick: (BluetoothDeviceDomain) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {

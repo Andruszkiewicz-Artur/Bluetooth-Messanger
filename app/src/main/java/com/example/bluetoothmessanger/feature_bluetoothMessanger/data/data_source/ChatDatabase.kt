@@ -10,7 +10,6 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.Us
     version = 1
 )
 abstract class ChatDatabase: RoomDatabase() {
-
     abstract val messageDao: MessageDao
     abstract val userDao: UserDao
 }

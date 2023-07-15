@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.util.Log
 import com.example.bluetoothmessanger.core.static.Static.NAME_SERVICE
 import com.example.bluetoothmessanger.core.static.Static.UUID_IDENTYFICATOR
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toBluetoothDeviceDomain
@@ -102,6 +103,7 @@ class AndroidBluetoothController(
 
     override fun startDiscovery() {
         if(!hasPermission(Manifest.permission.BLUETOOTH_SCAN)) {
+            Log.d("Check error", "Don`t have permission")
             return
         }
 
