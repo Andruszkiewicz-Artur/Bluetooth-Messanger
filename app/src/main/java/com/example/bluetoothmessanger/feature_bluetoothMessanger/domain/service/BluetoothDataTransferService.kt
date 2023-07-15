@@ -1,6 +1,5 @@
 package com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.service
 
-import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toBluetoothMessage
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage

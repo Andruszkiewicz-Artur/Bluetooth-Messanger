@@ -1,5 +1,6 @@
 package com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller
 
+import android.bluetooth.BluetoothAdapter
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDevice
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage

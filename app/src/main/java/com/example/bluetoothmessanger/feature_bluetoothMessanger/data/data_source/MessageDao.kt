@@ -8,7 +8,7 @@ import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.Me
 @Dao
 interface MessageDao {
 
-    @Query("SELECT * FROM messages WHERE userAddress LIKE :userAddress ORDER BY timeSendMessage DESC")
+    @Query("SELECT * FROM messages WHERE userAddress LIKE :userAddress ORDER BY id DESC")
     fun getAllUserMessages(userAddress: String): List<MessageModel>
 
     @Insert()

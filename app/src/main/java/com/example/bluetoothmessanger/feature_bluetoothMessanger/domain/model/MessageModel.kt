@@ -16,9 +16,6 @@ data class MessageModel(
     @ColumnInfo(name = "userAddress")
     val userAddress: String,
 
-    @ColumnInfo(name = "isLocalMessage")
-    val isLocalMessage: Boolean,
-
-    @ColumnInfo(name = "timeSendMessage")
-    val timeSendMessage: Long
+    @ColumnInfo(name = "isFromLocalUser")
+    val isFromLocalUser: Boolean
 )

@@ -7,7 +7,7 @@ class AddMessageUseCase(
     private val repository: MessagesRepository
 ) {
 
-    suspend operator fun invoke(messageModel: MessageModel) {
+    suspend fun invoke(messageModel: MessageModel) {
         repository.addMessage(messageModel)
     }
 
