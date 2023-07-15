@@ -37,11 +37,6 @@ fun ChatMessage(
             .padding(16.dp)
     ) {
         Text(
-            text = message.senderName,
-            fontSize = 10.sp,
-            color = if (message.isFromLocalUser) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onSecondary
-        )
-        Text(
             text = message.message,
             color = if (message.isFromLocalUser) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier

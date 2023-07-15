@@ -2,6 +2,7 @@ package com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper
 
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.MessageModel
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.UserModel
 
 fun String.toBluetoothMessage(isFromLocalUser: Boolean): BluetoothMessage {
     val name = substringBeforeLast("#")
@@ -16,14 +17,6 @@ fun String.toBluetoothMessage(isFromLocalUser: Boolean): BluetoothMessage {
 
 fun BluetoothMessage.toByteArray(): ByteArray {
     return "$senderName#$message".encodeToByteArray()
-}
-
-fun MessageModel.toBluetoothMessage(): BluetoothMessage {
-    return BluetoothMessage(
-        senderName = this.userAddress,
-        message = this.message,
-        isFromLocalUser = this.isFromLocalUser
-    )
 }
 
 fun BluetoothMessage.toMessageModel(userAddress: String): MessageModel {

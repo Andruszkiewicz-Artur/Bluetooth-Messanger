@@ -70,6 +70,12 @@ fun ConnectPresentation(
                 },
                 onSendMessage = {
                     viewModel.onEvent(ConnectEvent.sendMessage(it))
+                },
+                removeUserName = {
+                    viewModel.onEvent(ConnectEvent.removeName)
+                },
+                editName = {
+                    viewModel.onEvent(ConnectEvent.setNewName(it))
                 }
             )
         }
@@ -78,6 +84,7 @@ fun ConnectPresentation(
                 DevicesList(
                     pairedDevices = state.pairedDevices,
                     scannedDevices = state.scannedDevices,
+                    usersNames = state.userNames,
                     onClick = { device ->
                         viewModel.onEvent(ConnectEvent.onDeviceClick(device))
                     }

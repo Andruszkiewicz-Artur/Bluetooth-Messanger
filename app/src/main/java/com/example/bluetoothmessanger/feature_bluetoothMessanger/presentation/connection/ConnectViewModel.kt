@@ -1,14 +1,10 @@
 package com.example.bluetoothmessanger.feature_bluetoothMessanger.presentation.connection
 
-import android.os.Message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toBluetoothMessage
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.data.mapper.toMessageModel
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.controller.BluetoothController
-import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothMessage
-import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.MessageModel
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.UserModel
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.message_use_cases.MessagesUseCases
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.use_cases.users_use_cases.UsersUseCases
@@ -101,7 +97,8 @@ class ConnectViewModel @Inject constructor(
                 _state.update { it.copy(
                     isConnecting = false,
                     isConnected = false,
-                    correspondenceAddress = null
+                    correspondenceAddress = null,
+                    correspondenceName = null
                 ) }
             }
             is ConnectEvent.sendMessage -> {
@@ -122,7 +119,10 @@ class ConnectViewModel @Inject constructor(
                 if(state.value.correspondenceAddress != null) {
                     viewModelScope.launch {
                         usersUseCases.removeUserNameUseCase.invoke(
-                            state.value.userNames.filter { it.id == state.value.correspondenceAddress }.first()
+                            UserModel(
+                                id = state.value.correspondenceAddress ?: "",
+                                userName = state.value.userNames[state.value.correspondenceAddress] ?: ""
+                            )
                         )
 
                         updateUserNames()
@@ -154,7 +154,8 @@ class ConnectViewModel @Inject constructor(
                         isConnected = true,
                         isConnecting = false,
                         errorMessage = null,
-                        correspondenceAddress = result.deviceAddress
+                        correspondenceAddress = result.deviceAddress,
+                        correspondenceName = result.deviceName
                     ) }
                 }
                 is ConnectionResult.TransferSucceeded -> {
@@ -169,7 +170,8 @@ class ConnectViewModel @Inject constructor(
                         isConnected = false,
                         isConnecting = false,
                         errorMessage = result.message,
-                        correspondenceAddress = null
+                        correspondenceAddress = null,
+                        correspondenceName = null
                     ) }
                 }
             }
@@ -177,7 +179,8 @@ class ConnectViewModel @Inject constructor(
             _state.update { it.copy(
                 isConnected = false,
                 isConnecting = false,
-                correspondenceAddress = null
+                correspondenceAddress = null,
+                correspondenceName = null
             ) }
         }.launchIn(viewModelScope)
     }

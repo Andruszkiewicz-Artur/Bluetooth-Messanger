@@ -14,12 +14,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDevice
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.BluetoothDeviceDomain
+import com.example.bluetoothmessanger.feature_bluetoothMessanger.domain.model.UserModel
 import com.example.bluetoothmessanger.feature_bluetoothMessanger.presentation.connection.ConnectEvent
 
 @Composable
 fun DevicesList(
     pairedDevices: List<BluetoothDevice>,
     scannedDevices: List<BluetoothDevice>,
+    usersNames: Map<String, String>,
     onClick: (BluetoothDeviceDomain) -> Unit
 ) {
     LazyColumn(
@@ -37,7 +39,7 @@ fun DevicesList(
 
         items(pairedDevices) {device ->
             Text(
-                text = device.name ?: "No name",
+                text = usersNames[device.address] ?: device.name ?: "No name",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -59,7 +61,7 @@ fun DevicesList(
 
         items(scannedDevices) {device ->
             Text(
-                text = device.name ?: "No name",
+                text = usersNames[device.address] ?: device.name ?: "No name",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
